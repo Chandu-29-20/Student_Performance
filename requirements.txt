@@ -9,5 +9,6 @@ Flask
 dill
 setuptools
 SHAP
+gunicorn==23.0.0
 
 -e .
