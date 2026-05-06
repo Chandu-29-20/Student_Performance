@@ -8,5 +8,6 @@ xgboost
 Flask
 dill
 setuptools
+SHAP
 
 -e .

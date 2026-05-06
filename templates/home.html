@@ -1,111 +1,237 @@
+<!DOCTYPE html>
 <html>
+<head>
+
+    <title>Student Performance Predictor</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='style.css') }}">
+
+</head>
+
 <body>
-    <div class="login">
-       <h1>Student Exam Performance Indicator</h1>
-   
-       <form action="{{ url_for('predict_datapoint')}}" method="post">
-        <h1>
-            <legend>Student Exam Performance Prediction</legend>
-        </h1>
-        <div class="mb-3">
-            <label class="form-label">Gender</label>
-            <select class="form-control" name="gender" placeholder="Enter you Gender" required>
-                <option class="placeholder" selected disabled value="">Select your Gender</option>
-                <option value="male">
-                    Male
-                </option>
-                <option value="female">
-                    Female
-                </option>
-            </select>
+
+<div class="container">
+
+    <div class="title">
+        Student Performance Predictor
+    </div>
+
+    <div class="subtitle">
+        Academic Analytics System
+    </div>
+
+    <!-- FORM CARD -->
+
+    <div class="card">
+
+        <form action="/predictdata" method="post">
+
+            <div class="form-grid">
+
+                <div>
+                    <label>Gender</label>
+                    <select name="gender">
+                        <option value="male" {% if gender == 'male' %}selected{% endif %}>Male</option>
+                        <option value="female" {% if gender == 'female' %}selected{% endif %}>Female</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label>Race Ethnicity</label>
+                    <select name="ethnicity">
+                        <option value="group A" {% if race_ethnicity == 'group A' %}selected{% endif %}>Group A</option>
+                        <option value="group B" {% if race_ethnicity == 'group B' %}selected{% endif %}>Group B</option>
+                        <option value="group C" {% if race_ethnicity == 'group C' %}selected{% endif %}>Group C</option>
+                        <option value="group D" {% if race_ethnicity == 'group D' %}selected{% endif %}>Group D</option>
+                        <option value="group E" {% if race_ethnicity == 'group E' %}selected{% endif %}>Group E</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label>Parental Education</label>
+                    <select name="parental_level_of_education">
+                        <option value="bachelor's degree">Bachelor's Degree</option>
+                        <option value="master's degree">Master's Degree</option>
+                        <option value="associate's degree">Associate's Degree</option>
+                        <option value="high school">High School</option>
+                        <option value="some college">Some College</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label>Lunch</label>
+                    <select name="lunch">
+                        <option value="standard">Standard</option>
+                        <option value="free/reduced">Free/Reduced</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label>Test Preparation Course</label>
+                    <select name="test_preparation_course">
+                        <option value="completed">Completed</option>
+                        <option value="none">None</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label>Reading Score</label>
+                    <input
+                    type="number"
+                    name="reading_score"
+                    value="{{ reading_score if reading_score else '' }}"
+                    required
+                    >
+                </div>
+
+                <div>
+                    <label>Writing Score</label>
+                    <input
+                    type="number"
+                    name="writing_score"
+                    value="{{ writing_score if writing_score else '' }}"
+                    required
+                    >
+                </div>
+
+            </div>
+
+            <button type="submit">
+                Predict Performance
+            </button>
+
+            <button
+            type="button"
+            class="reset-btn"
+            onclick="resetForm()"
+            >
+            Reset Form
+        </button>
+
+        </form>
+
+    </div>
+
+    <!-- RESULT CARD -->
+
+    {% if results %}
+
+    <div class="card result-card">
+
+        <div class="section-title">
+            Prediction Result
         </div>
-        <div class="mb-3">
-            <label class="form-label">Race or Ethnicity</label>
-            <select class="form-control" name="ethnicity" placeholder="Enter you ethnicity" required>
-                <option class="placeholder" selected disabled value="">Select Ethnicity</option>
-                <option value="group A">
-                    Group A
-                </option>
-                <option value="group B">
-                    Group B
-                </option>
-                <option value="group C">
-                    Group C
-                </option>
-                <option value="group D">
-                    Group D
-                </option>
-                <option value="group E">
-                    Group E
-                </option>
-            </select>
+
+        <div class="score">
+            {{ results }}
         </div>
-        <div class="mb-3">
-            <label class="form-label">Parental Level of Education</label>
-            <select class="form-control" name="parental_level_of_education"
-                placeholder="Enter you Parent Education" required>
-                <option class="placeholder" selected disabled value="">Select Parent Education</option>
-                <option value="associate's degree">
-                    associate's degree
-                </option>
-                <option value="bachelor's degree">
-                    bachelor's degree
-                </option>
-                <option value="high school">
-                    high school
-                </option>
-                <option value="master's degree">
-                    master's degree
-                </option>
-                <option value="some college">
-                    some college
-                </option>
-                <option value="some high school">
-                    some high school
-                </option>
-            </select>
+
+        <div class="performance">
+            Performance: {{ performance }}
         </div>
-        <div class="mb-3">
-            <label class="form-label">Lunch Type</label>
-            <select class="form-control" name="lunch" placeholder="Enter you Lunch" required>
-                <option class="placeholder" selected disabled value="">Select Lunch Type</option>
-                <option value="free/reduced">
-                    free/reduced
-                </option>
-                <option value="standard">
-                    standard
-                </option>
-            </select>
+
+    </div>
+
+    {% endif %}
+
+    <!-- SHAP GRAPH -->
+
+    {% if shap_plot %}
+
+    <div class="card">
+
+        <div class="section-title">
+            Analysis
         </div>
-        <div class="mb-3">
-            <label class="form-label">Test preparation Course</label>
-            <select class="form-control" name="test_preparation_course" placeholder="Enter you Course"
-                required>
-                <option class="placeholder" selected disabled value="">Select Test_course</option>
-                <option value="none">
-                    None
-                </option>
-                <option value="completed">
-                    Completed
-                </option>
-            </select>
+
+        <img src="{{ shap_plot }}"
+             class="shap-image">
+
+    </div>
+
+    {% endif %}
+
+    <!-- FEATURE IMPORTANCE -->
+
+    {% if importance_data %}
+
+    <div class="card">
+
+        <div class="section-title">
+            Top Influencing Features
         </div>
-        <div class="mb-3">
-            <label class="form-label">Writing Score out of 100</label>
-            <input class="form-control" type="number" name="reading_score"
-                placeholder="Enter your Reading score" min='0' max='100' />
+
+        <table class="table">
+
+            <tr>
+                <th>Feature</th>
+                <th>Impact</th>
+            </tr>
+
+            {% for feature, impact in importance_data %}
+
+            <tr>
+                <td>{{ feature }}</td>
+                <td>{{ impact }}</td>
+            </tr>
+
+            {% endfor %}
+
+        </table>
+
+    </div>
+
+    {% endif %}
+
+    <!-- RECOMMENDATIONS -->
+
+    {% if recommendations %}
+
+    <div class="card">
+
+        <div class="section-title">
+            Recommendations
         </div>
-        <div class="mb-3">
-            <label class="form-label">Reading Score out of 100</label>
-            <input class="form-control" type="number" name="writing_score"
-                placeholder="Enter your Reading Score" min='0' max='100' />
-        </div>
-        <div class="mb-3">
-            <input class="btn btn-primary" type="submit" value="Predict your Maths Score" required />
-        </div>
-    </form>
-    <h2>
-       THE  prediction is {{results}}
-    </h2>
-   <body>
+
+        <ul class="recommendation-list">
+
+            {% for rec in recommendations %}
+
+            <li>
+                {{ rec }}
+            </li>
+
+            {% endfor %}
+
+        </ul>
+
+    </div>
+
+    {% endif %}
+
+</div>
+<script>
+
+function resetForm() {
+
+    // Reset form
+    document.querySelector("form").reset();
+
+    // Clear number inputs
+    document.querySelector(
+        'input[name="reading_score"]'
+    ).value = "";
+
+    document.querySelector(
+        'input[name="writing_score"]'
+    ).value = "";
+
+    // Redirect to clean page
+    window.location.href = "/predictdata";
+}
+
+</script>
+
+</body>
 </html>

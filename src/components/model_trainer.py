@@ -88,17 +88,17 @@ class ModelTrainer:
                                              models=models,param=params)
             
             ## To get best model score from dict
-            best_model_score = max(sorted(model_report.values()))
+            # =====================================================
+            # FORCE RANDOM FOREST MODEL
+            # =====================================================
 
-            ## To get best model name from dict
+            best_model = RandomForestRegressor(
+                n_estimators=128,
+                random_state=42
+                )
+            best_model.fit(X_train, y_train)
+            logging.info("Random Forest model selected")
 
-            best_model_name = list(model_report.keys())[
-                list(model_report.values()).index(best_model_score)
-            ]
-            best_model = models[best_model_name]
-
-            if best_model_score<0.6:
-                raise CustomException("No best model found")
             logging.info(f"Best found model on both training and testing dataset")
 
             save_object(
